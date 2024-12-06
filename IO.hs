@@ -2,59 +2,96 @@
 {-# OPTIONS_GHC -Wall #-}
 
 module Checkers where
-    import System.IO ()
+    import System.IO
+    import System.Directory (doesFileExist)
     import Control.Monad
+    import Text.ParserCombinators.Parsec
+    import GameState
+    blankGame = initGameState
 
-enterMove :: IO ()
-enterMove = do
-    putStrLn "Enter the position of the piece you'd like to move, e.g. F6."
-    piece <- getLine
-    putStrLn "Enter the position you're moving to, e.g. G5."
-    move <- getLine
-    let start = read piece :: [Char]
-    let end = read move :: [Char]
-    if head start `elem` ['A'..'H'] && start !! 1 `elem` ['1'..'8']
-        && head end`elem` ['A'..'H'] && end !! 1 `elem` ['1'..'8']
-        then putStrLn "Valid move."
-        saveMove start end
-        else putStrLn "Not a valid move."
+    saveFile :: FilePath -> GameState -> IO ()
+    saveFile save gameState = do
+        exists <- doesFileExist save
+        if exists then do putStrLn "Saving current game state."
+            else do putStrLn "No save exists."
+        appendFile save ("(" ++ show (currentPlayer gameState) ++ ")\n")
 
-saveMove :: [Char] -> [Char] -> IO ()
-saveMove start end = do
-    putStrLn "Saving move." -- error checking
+    loadFile :: FilePath -> IO GameState
+    loadFile save = do
+        exists <- doesFileExist save
+        if exists
+            then do
+            file <- openFile save ReadMode
+            _ <- putStrLn ("Loading save " ++ show file)
+            input <- hGetContents file
+            let lastLine = last (lines input)
+            let newPlayer = read (init (tail lastLine)) :: Player
+            let newGameState = initGameState { currentPlayer = newPlayer }
+            putStrLn $ "Loaded player: " ++ show newPlayer
+            hClose file
+            return newGameState
+        else do
+            putStrLn "No save exists."
+            return initGameState
 
-saveFile :: IO ()
-saveFile = do
-    putStrLn "Saving current game state."
-    writeFile "save.txt" "TEST STRING"
-    appendFile "save.txt" "ADDITIONAL STRING"
+    testIO :: IO ()
+    testIO = do
+        saveFile "test1.txt" blankGame
+        let newPlayer = switchPlayer (currentPlayer blankGame)
+        let newGameState = blankGame { currentPlayer = newPlayer }
+        putStrLn $ "Switched player to: " ++ show newPlayer
+        saveFile "test1.txt" newGameState
 
-loadFile :: IO ()
-loadFile = do
-    if doesFileExist "save.txt"
-        file <- openFile "save.txt" ReadMode
-        putStrLn "Loading last save."
-        input <- hGetContents file
-        let summary = (countsText . getCounts) input
-        putStrLn summary
-        hClose file
-    else
-        putStrLn "No save exists."
+        putStrLn $ "Creating new save."
+        saveFile "test2.txt" blankGame
+        
+        retrieveGameState <- loadFile "test1.txt"
+        let newPlayer = switchPlayer (currentPlayer retrieveGameState)
+        let newGameState = retrieveGameState { currentPlayer = newPlayer }
+        putStrLn $ "Switched player to: " ++ show newPlayer
+        saveFile "test1.txt" newGameState
 
-retrieveLine :: IO String
-retrieveLine = do x <- getChar
-                  if x == '\n'
-                    then return ""
-                    else do y <- retrieveLine
-                            return (x:y)
+    enterMove :: [String] -> IO ()
+    enterMove start = do
+        putStrLn "Enter the position of the piece you'd like to move, e.g. F6."
+        piece <- getLine
+        putStrLn "Enter the position you're moving to, e.g. G5."
+        move <- getLine
+        let start = read piece :: [Char]
+        let end = read move :: [Char]
+        if head start `elem` ['A'..'H'] && start !! 1 `elem` ['1'..'8']
+            && head end`elem` ['A'..'H'] && end !! 1 `elem` ['1'..'8']
+            then do
+                putStrLn "Valid move."
+                saveMove start end
+            else putStrLn "Not a valid move."
+            
+    getCounts :: String -> [Int]
+    getCounts = map read . words
 
-main = do  
-        contents <- readFile "test.txt"
-        print . map readInt . words $ contents
+    countsText :: [Int] -> String
+    countsText = unwords . map show
+
+    saveMove :: [Char] -> [Char] -> IO ()
+    saveMove start end = do
+        putStrLn "Saving move." -- error checking
+
+    retrieveLine :: IO String
+    retrieveLine = do
+        x <- getChar
+        if x == '\n'
+            then return ""
+            else do
+                y <- retrieveLine
+                return (x:y)
+
+-- instance ToJSON GameState where
+--     toJSON (GameState board currentPlayer) = object ["board" .= board, "player" .= currentPlayer]
+
+-- main = do  
+--         contents <- readFile "test.txt"
+--         print . map readInt . words $ contents
 -- alternately, main = print . map readInt . words =<< readFile "test.txt"
-
-readInt :: String -> Int
-readInt = read
 
 -- show _
 -- when (x) $ do

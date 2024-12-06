@@ -7,11 +7,11 @@ import qualified Data.Map as Map
 
 -- Define the two players, Red and Black. The `deriving` clause automatically provides
 -- instances for `Show` (to print values) and `Eq` (to compare values).
-data Player = Red | Black deriving (Show, Eq)
+data Player = Red | Black deriving (Show, Read, Eq)
 
 -- Define the two types of pieces: Regular and King, each belonging to one of the players.
 -- This type indicates the type and ownership of each piece.
-data Piece = Regular Player | King Player deriving (Show, Eq)
+data Piece = Regular Player | King Player deriving (Show, Read, Eq)
 
 -- Define Position as a pair of integers representing (row, column) on an 8x8 board.
 type Position = (Int, Int)
