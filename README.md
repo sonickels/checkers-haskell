@@ -1,12 +1,9 @@
-The classic two-player checkers game in Haskell. 
+The classic two-player checkers game in Haskell. The external libraries that we used were QuickCheck and Containers.
 
-
-main.hs - responsible for the game rules and dictating the rest of the modules
+Main.hs - responsible for the game rules and dictating the rest of the modules
 
 GameState.hs - defines structure and state changes for the board and pieces
 
-MoveLogic.hs - checks for valid moves and special cases
+Checkers.hs - handles the game processes, including if a piece is captured, a piece upgrades into a king, etc.
 
-CaptureLogic.hs - handles what happens when a piece is captured
-
-IO.hs - controls input / output to direct the player and saving / loading the game
+IO.hs - takes care of saving / loading the game
