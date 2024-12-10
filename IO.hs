@@ -28,7 +28,6 @@ loadFile save = do
         let lastLine = last (lines input)
         let newPlayer = read (init (tail lastLine)) :: Player
         let newGameState = initGameState { currentPlayer = newPlayer }
-        putStrLn $ "Loaded player: " ++ show newPlayer
         hClose file
         return newGameState
     -- else do
@@ -61,22 +60,27 @@ processLine gameState line = do
 testIO :: IO ()
 testIO = do
     saveFile "test1.txt" initGameState (2, 2) (3, 3)
+    putStrLn "Saved move (2, 2) -> (3, 3)"
     let newPlayer = switchPlayer (currentPlayer initGameState)
-    let newGameState = initGameState { currentPlayer = newPlayer }
-    putStrLn $ "Switched player to: " ++ show newPlayer
-    saveFile "test1.txt" newGameState (3, 3) (4, 4)
+    let newGameState = initGameState { currentPlayer = newPlayer, board = board initGameState }
+    saveFile "test1.txt" newGameState (5, 1) (4, 2)
+    printBoard (board newGameState)
+    putStrLn "Saved move (5, 1) -> (4, 2)"
 
-    putStrLn "Creating new save."
+    putStrLn "\nCreating new save."
     saveFile "test2.txt" initGameState (2, 3) (3, 4)
+    putStrLn "\n"
 
-    retrieveGameState <- loadFile "test1.txt"
-    let newPlayer2 = switchPlayer (currentPlayer retrieveGameState)
-    let newGameState2 = retrieveGameState { currentPlayer = newPlayer2 }
-    putStrLn $ "Switched player to: " ++ show newPlayer2
-    saveFile "test1.txt" newGameState2 (4, 4) (5, 5)
+    -- retrieveGameState <- loadFile "test1.txt"
+    -- let newPlayer2 = switchPlayer (currentPlayer retrieveGameState)
+    -- let newGameState2 = retrieveGameState { currentPlayer = newPlayer2 }
+    -- saveFile "test1.txt" newGameState2 (4, 4) (5, 5)
 
     putStrLn "Reading file:"
     readFileLoop "test1.txt"
+
+    -- removeFile "test1.txt"
+    -- removeFile "test2.txt"
 
 -- enterMove :: [String] -> IO ()
 -- enterMove start = do
