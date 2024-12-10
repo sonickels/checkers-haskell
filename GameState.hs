@@ -1,7 +1,7 @@
 module GameState where
 
 -- Define the two players, PlayerRed and PlayerBlack
-data Player = PlayerRed | PlayerBlack deriving (Show, Eq)
+data Player = PlayerRed | PlayerBlack deriving (Show, Read, Eq)
 
 -- Define the pieces on the board: Empty, Black, Red
 data Piece = Empty | Black | Red deriving (Show, Eq)

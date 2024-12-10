@@ -53,26 +53,30 @@ readFileLoop save = do
 processLine :: GameState -> String -> IO GameState
 processLine gameState line = do
     let (player, from, to) = parseLine line
-    let _ = movePiece (board gameState) from to player
+    let piece = if player == PlayerBlack then Black else Red
+    let _ = movePiece (board gameState) from to piece
     let nextPlayer = switchPlayer (currentPlayer gameState)
     return $ gameState { board = board gameState, currentPlayer = nextPlayer }
 
--- testIO :: IO ()
--- testIO = do
---     saveFile "test1.txt" initGameState
---     let newPlayer = switchPlayer (currentPlayer initGameState)
---     let newGameState = initGameState { currentPlayer = newPlayer }
---     putStrLn $ "Switched player to: " ++ show newPlayer
---     saveFile "test1.txt" newGameState
+testIO :: IO ()
+testIO = do
+    saveFile "test1.txt" initGameState (2, 2) (3, 3)
+    let newPlayer = switchPlayer (currentPlayer initGameState)
+    let newGameState = initGameState { currentPlayer = newPlayer }
+    putStrLn $ "Switched player to: " ++ show newPlayer
+    saveFile "test1.txt" newGameState (3, 3) (4, 4)
 
---     putStrLn $ "Creating new save."
---     saveFile "test2.txt" initGameState
-    
---     retrieveGameState <- loadFile "test1.txt"
---     let newPlayer = switchPlayer (currentPlayer retrieveGameState)
---     let newGameState = retrieveGameState { currentPlayer = newPlayer }
---     putStrLn $ "Switched player to: " ++ show newPlayer
---     saveFile "test1.txt" newGameState
+    putStrLn "Creating new save."
+    saveFile "test2.txt" initGameState (2, 3) (3, 4)
+
+    retrieveGameState <- loadFile "test1.txt"
+    let newPlayer2 = switchPlayer (currentPlayer retrieveGameState)
+    let newGameState2 = retrieveGameState { currentPlayer = newPlayer2 }
+    putStrLn $ "Switched player to: " ++ show newPlayer2
+    saveFile "test1.txt" newGameState2 (4, 4) (5, 5)
+
+    putStrLn "Reading file:"
+    readFileLoop "test1.txt"
 
 -- enterMove :: [String] -> IO ()
 -- enterMove start = do
