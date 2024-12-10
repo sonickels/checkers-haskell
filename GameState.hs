@@ -1,10 +1,11 @@
 module GameState where
 
 -- Define the two players, PlayerRed and PlayerBlack
-data Player = PlayerRed | PlayerBlack deriving (Show, Read, Eq)
+data Player = PlayerRed | PlayerBlack deriving (Show, Eq)
 
 -- Define the pieces on the board: Empty, Black, Red
-data Piece = Empty | Black | Red deriving (Show, Eq)
+data Piece = Empty | Black | Red | BlackKing | RedKing
+  deriving (Show, Eq)
 
 -- Define Position as a pair of integers (row, column)
 type Position = (Int, Int)
