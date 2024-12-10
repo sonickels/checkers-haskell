@@ -177,14 +177,14 @@ playGame board player = do
   case moveResult of
     Just newBoard -> do
       let updatedBoard = promoteToKing newBoard
-          
+          wasRegMove = abs (x2 - x1) == 1  -- Assumes capture moves involve jumping over a square
       -- Check for a winner after the move
       winner <- checkWinner updatedBoard player
       if winner then
         return ()  -- Game ends if there's a winner
       else do
         let moreCaptures = findCaptures updatedBoard (x2, y2) player
-        if null moreCaptures
+        if null moreCaptures || wasRegMove
           then do
             putStrLn "Move successful!"
             let nextPlayer = if player == Black || player == BlackKing then Red else Black
