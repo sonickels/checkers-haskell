@@ -1,6 +1,5 @@
--- Define the piece types: Empty, Black, Red
-data Piece = Empty | Black | Red
-  deriving (Show, Eq)
+module Checkers where
+import GameState
 
 -- Define the size of the board
 boardSize :: Int
@@ -74,16 +73,6 @@ capturePiece board (x1, y1) (x2, y2) player =
       newBoard = replaceInBoard (replaceInBoard board y1 newRow1) y2 newRow2
   in replaceInBoard newBoard captureY (replaceInRow (newBoard !! captureY) captureX Empty)  -- Remove captured piece
 
--- Helper function to replace a piece in a specific row
-replaceInRow :: [Piece] -> Int -> Piece -> [Piece]
-replaceInRow row idx newPiece =
-  take idx row ++ [newPiece] ++ drop (idx + 1) row
-
--- Helper function to replace a row in the board
-replaceInBoard :: [[Piece]] -> Int -> [Piece] -> [[Piece]]
-replaceInBoard board idx newRow =
-  take idx board ++ [newRow] ++ drop (idx + 1) board
-
 -- Function to check if the move is a capture
 isCapture :: [[Piece]] -> (Int, Int) -> (Int, Int) -> Piece -> Bool
 isCapture board (x1, y1) (x2, y2) player =
@@ -130,9 +119,3 @@ playGame board player = do
       -- If the move is invalid, notify the player and ask them to try again
       putStrLn "Invalid move! Please try again."
       playGame board player  -- Continue with the same player's turn
-
--- Main function to start the game
-main :: IO ()
-main = do
-  let initialBoard = createBoard
-  playGame initialBoard Black  -- Black starts the game
