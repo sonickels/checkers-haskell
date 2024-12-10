@@ -19,6 +19,11 @@ data GameState = GameState
   , currentPlayer :: Player
   } deriving (Show)
 
+-- Define the size of the board
+boardSize :: Int
+boardSize = 8
+
+
 -- Initialize the board with the starting positions of the pieces
 initBoard :: Board
 initBoard = [
